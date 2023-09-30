@@ -91,7 +91,9 @@ class NavigationAgent3D : public Node {
 	// While not perfect it at least looks way better than agent's that clip through everything that is not a flat surface
 	float stored_y_velocity = 0.0;
 
+	bool target_position_initialized = false;
 	bool target_position_submitted = false;
+
 	bool target_reached = false;
 	bool navigation_finished = true;
 	// No initialized on purpose

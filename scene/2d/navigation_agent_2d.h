@@ -84,6 +84,7 @@ class NavigationAgent2D : public Node {
 	Vector2 velocity_forced;
 	bool velocity_forced_submitted = false;
 
+	bool target_position_initialized = false;
 	bool target_position_submitted = false;
 
 	bool target_reached = false;

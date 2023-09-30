@@ -274,6 +274,8 @@ void NavigationAgent2D::_notification(int p_what) {
 						NavigationServer2D::get_singleton()->agent_set_velocity_forced(agent, velocity_forced);
 					}
 				}
+			}
+			if (agent_parent && target_position_initialized) {
 				_check_distance_to_target();
 			}
 #ifdef DEBUG_ENABLED
@@ -546,6 +548,7 @@ void NavigationAgent2D::set_target_position(Vector2 p_position) {
 	// Revisit later when the navigation server can update the path without requesting a new path.
 
 	target_position = p_position;
+	target_position_initialized = true;
 	target_position_submitted = true;
 
 	_request_repath();
