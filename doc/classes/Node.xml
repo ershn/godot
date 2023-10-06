@@ -198,7 +198,12 @@
 		<method name="can_process" qualifiers="const">
 			<return type="bool" />
 			<description>
-				Returns [code]true[/code] if the node can process while the scene tree is paused (see [member process_mode]). Always returns [code]true[/code] if the scene tree is not paused, and [code]false[/code] if the node is not in the tree.
+				Returns whether the node can process by checking the value of [member process_mode] and [member SceneTree.paused]. If the node can process, callbacks like [method _process] and [method _physics_process] will be called.
+				If [member process_mode] is set to [constant PROCESS_MODE_PAUSABLE], returns [code]true[/code] when the game is not paused.
+				If [member process_mode] is set to [constant PROCESS_MODE_WHEN_PAUSED], returns [code]true[/code] when the game is paused.
+				If [member process_mode] is set to [constant PROCESS_MODE_ALWAYS], always returns [code]true[/code].
+				If [member process_mode] is set to [constant PROCESS_MODE_DISABLED], always returns [code]false[/code].
+				If [member process_mode] is set to [constant PROCESS_MODE_INHERIT], use the value of its parent's [member process_mode] to determine the result.
 			</description>
 		</method>
 		<method name="create_tween">
@@ -798,7 +803,7 @@
 			<return type="void" />
 			<param index="0" name="enable" type="bool" />
 			<description>
-				Enables or disables physics (i.e. fixed framerate) processing. When a node is being processed, it will receive a [constant NOTIFICATION_PHYSICS_PROCESS] at a fixed (usually 60 FPS, see [member Engine.physics_ticks_per_second] to change) interval (and the [method _physics_process] callback will be called if exists). Enabled automatically if [method _physics_process] is overridden. Any calls to this before [method _ready] will be ignored.
+				Enables or disables physics (i.e. fixed framerate) processing. When a node is being processed, it will receive a [constant NOTIFICATION_PHYSICS_PROCESS] at a fixed (usually 60 FPS, see [member Engine.physics_ticks_per_second] to change) interval (and the [method _physics_process] callback will be called if it exists). Enabled automatically if [method _physics_process] is overridden. Any calls to this before [method _ready] will be ignored.
 			</description>
 		</method>
 		<method name="set_physics_process_internal">
@@ -813,7 +818,8 @@
 			<return type="void" />
 			<param index="0" name="enable" type="bool" />
 			<description>
-				Enables or disables processing. When a node is being processed, it will receive a [constant NOTIFICATION_PROCESS] on every drawn frame (and the [method _process] callback will be called if exists). Enabled automatically if [method _process] is overridden. Any calls to this before [method _ready] will be ignored.
+				Enables or disables processing. When a node is being processed, it will receive a [constant NOTIFICATION_PROCESS] on every drawn frame (and the [method _process] callback will be called if it exists). Enabled automatically if [method _process] is overridden. Any calls to this before [method _ready] will be ignored.
+				[b]Note:[/b] This method only affects the [method _process] callback, i.e. it has no effect on other callbacks like [method _physics_process]. If you want to disable all processing for the node, set [member process_mode] to [constant PROCESS_MODE_DISABLED].
 			</description>
 		</method>
 		<method name="set_process_input">
@@ -892,7 +898,7 @@
 			[b]Note:[/b] If you want a child to be persisted to a [PackedScene], you must set [member owner] in addition to calling [method add_child]. This is typically relevant for [url=$DOCS_URL/tutorials/plugins/running_code_in_the_editor.html]tool scripts[/url] and [url=$DOCS_URL/tutorials/plugins/editor/index.html]editor plugins[/url]. If a new node is added to the tree without setting its owner as an ancestor in that tree, it will be visible in the 2D/3D view, but not in the scene tree (and not persisted when packing or saving).
 		</member>
 		<member name="process_mode" type="int" setter="set_process_mode" getter="get_process_mode" enum="Node.ProcessMode" default="0">
-			Can be used to pause or unpause the node, or make the node paused based on the [SceneTree], or make it inherit the process mode from its parent (default).
+			Defines when the node should process. Can be used to forcibly pause or unpause the node, pause the node based on [member SceneTree.paused], or make it behave like its parent (default).
 		</member>
 		<member name="process_physics_priority" type="int" setter="set_physics_process_priority" getter="get_physics_process_priority" default="0">
 			Similar to [member process_priority] but for [constant NOTIFICATION_PHYSICS_PROCESS], [method _physics_process] or the internal version.
@@ -1135,7 +1141,7 @@
 			Only process when the [SceneTree] is paused (don't process when unpaused). This is the inverse of [constant PROCESS_MODE_PAUSABLE].
 		</constant>
 		<constant name="PROCESS_MODE_ALWAYS" value="3" enum="ProcessMode">
-			Always process. Continue processing always, ignoring the [SceneTree]'s paused property. This is the inverse of [constant PROCESS_MODE_DISABLED].
+			Always process. Always continue processing, ignoring the [SceneTree]'s paused property. This is the inverse of [constant PROCESS_MODE_DISABLED].
 		</constant>
 		<constant name="PROCESS_MODE_DISABLED" value="4" enum="ProcessMode">
 			Never process. Completely disables processing, ignoring the [SceneTree]'s paused property. This is the inverse of [constant PROCESS_MODE_ALWAYS].
